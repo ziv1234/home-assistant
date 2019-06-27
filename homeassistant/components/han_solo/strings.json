@@ -1,0 +1,18 @@
+{
+    "config": {
+        "title": "HAN ",
+        "step": {
+            "user": {
+                "title": "Location",
+                "description": "Han Solo setup",
+                "data": {
+                    "name": "Name",
+                    "hostname": "Hostname"
+                }
+            }
+        },
+        "error": {
+            "name_exists": "Name already exists"
+        }
+    }
+}

@@ -1,0 +1,11 @@
+{
+  "domain": "han_solo",
+  "name": "Han solo",
+  "config_flow": true,
+  "documentation": "https://www.home-assistant.io/components/han_solo",
+  "requirements": ["crcmod==1.7"],
+  "dependencies": [],
+  "codeowners": [
+    "@danielhiversen"
+  ]
+}
