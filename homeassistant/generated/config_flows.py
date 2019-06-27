@@ -18,6 +18,7 @@ FLOWS = [
     "geofency",
     "geonetnz_quakes",
     "gpslogger",
+    "han_solo",
     "hangouts",
     "heos",
     "homekit_controller",
