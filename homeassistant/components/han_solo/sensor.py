@@ -270,7 +270,7 @@ class SubscriptionManager:
         decoded_data = self.decode(msg)
 
         if decoded_data is None:
-            _LOGGER.error("Failed to decode data %s", msg)
+            _LOGGER.warning("Failed to decode data %s", msg)
             return
 
         for callback in self.subscriptions:
@@ -285,15 +285,15 @@ class SubscriptionManager:
         if (len(data) < 9
                 or not data[0] == FEND
                 or not data[-1] == FEND):
-            _LOGGER.error("Invalid data %s", data)
+            _LOGGER.warning("Invalid data %s", data)
             return None
 
         data = data[1:-1]
         crc = self._crc(data[:-2])
         crc ^= 0xffff
         if crc != struct.unpack("<H", data[-2:])[0]:
-            _LOGGER.error("Invalid crc %s %s, %s", crc, struct.unpack("<H", data[-2:])[0],
-                          ''.join('{:02x}'.format(x).upper() for x in data))
+            _LOGGER.warning("Invalid crc %s %s, %s", crc, struct.unpack("<H", data[-2:])[0],
+                            ''.join('{:02x}'.format(x).upper() for x in data))
             return None
 
         buf = ''.join('{:02x}'.format(x).upper() for x in data)
@@ -333,7 +333,7 @@ def valid_time(time_stamp):
         return True
     if not isinstance(time_stamp, datetime):
         return False
-    return abs((time_stamp - datetime.now()).total_seconds()) < 3600 * 3
+    return abs((time_stamp - datetime.now()).total_seconds()) < 3600 * 2
 
 
 def decode_kaifa(buf, log=False):
