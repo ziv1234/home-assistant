@@ -8,8 +8,7 @@ from homeassistant.helpers.entity import Entity
 from .const import DOMAIN
 
 
-async def async_setup_platform(hass, config, async_add_entities,
-                               discovery_info=None):
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the Han solo device."""
 
 
@@ -21,29 +20,31 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 class HanSoloEntity(Entity):
     """Representation of a Han solo device."""
+
     def __init__(self, name, hostname):
         """Initialize the sensor."""
         self._sub_manager = None
         self._hostname = hostname
         self._state = None
-        self._unit_of_measurement = 'W'
+        self._unit_of_measurement = "W"
         self._name = name
 
     async def async_added_to_hass(self):
         """Start subscribing to han solo."""
-        self._sub_manager = SubscriptionManager(self.hass.loop,
-                                                async_get_clientsession(self.hass),
-                                                self._hostname)
+        self._sub_manager = SubscriptionManager(
+            self.hass.loop, async_get_clientsession(self.hass), self._hostname
+        )
         self._sub_manager.start()
         await self._sub_manager.subscribe(self._async_callback)
         self.hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, self.remove_from_hass)
 
     async def _async_callback(self, payload):
         """Handle received data."""
-        self._state = payload.get('Effect')
+        self._state = payload.get("Effect")
         self.async_schedule_update_ha_state()
 
     async def remove_from_hass(self, _):
+        """Remove from hass."""
         await self._sub_manager.stop()
 
     @property
@@ -72,17 +73,15 @@ class HanSoloEntity(Entity):
     def device_info(self):
         """Return the device info."""
         return {
-            'identifiers': {
-                (DOMAIN, self.unique_id)
-            },
-            'name': self.name,
-            'manufacturer': 'Tibber',
+            "identifiers": {(DOMAIN, self.unique_id)},
+            "name": self.name,
+            "manufacturer": "Tibber",
         }
 
     @property
     def icon(self):
         """Return the icon to use in the frontend."""
-        return 'mdi:power-plug'
+        return "mdi:power-plug"
 
     @property
     def unit_of_measurement(self):
@@ -93,4 +92,3 @@ class HanSoloEntity(Entity):
     def unique_id(self):
         """Return a unique ID."""
         return self._name
-
