@@ -1,9 +1,9 @@
 {
     "config": {
-        "title": "HAN ",
+        "title": "HAN SOLO",
         "step": {
             "user": {
-                "title": "Location",
+                "title": "Setup",
                 "description": "Han Solo setup",
                 "data": {
                     "name": "Name",
