@@ -352,9 +352,6 @@ concord232==0.15
 # homeassistant.components.xiaomi_miio
 construct==2.9.45
 
-# homeassistant.components.han_solo
-crcmod==1.7
-
 # homeassistant.scripts.credstash
 # credstash==1.15.0
 
@@ -592,6 +589,9 @@ haanna==0.10.1
 
 # homeassistant.components.habitica
 habitipy==0.2.0
+
+# homeassistant.components.han_solo
+han_solo==0.1
 
 # homeassistant.components.hangouts
 hangups==0.4.9
