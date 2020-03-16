@@ -74,4 +74,5 @@ IGNORE_UNCAUGHT_EXCEPTIONS = [
     "tests.components.zha.test_sensor",
     "tests.components.zha.test_switch",
     "tests.components.zwave.test_init",
+    "tests.helpers.test_entity_platform",
 ]
