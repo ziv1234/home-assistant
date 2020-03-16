@@ -19,6 +19,8 @@ from homeassistant.exceptions import ServiceNotFound
 from homeassistant.setup import async_setup_component
 from homeassistant.util import location
 
+from tests.ignore_uncaught_exceptions import IGNORE_UNCAUGHT_EXCEPTIONS
+
 pytest.register_assert_rewrite("tests.common")
 
 from tests.common import (  # noqa: E402, isort:skip
@@ -89,67 +91,7 @@ def hass(loop, hass_storage, request):
 
     def fin():
         for ex in exceptions:
-            print(str(request.function.__name__))
-            print(str(request.module.__name__))
-            if request.module.__name__ in [
-                "tests.components.cast.test_media_player",
-                "tests.components.config.test_group",
-                "tests.components.deconz.test_init",
-                "tests.components.default_config.test_init",
-                "tests.components.demo.test_init",
-                "tests.components.directv.test_media_player",
-                "tests.components.discovery.test_init",
-                "tests.components.dsmr.test_sensor",
-                "tests.components.dyson.test_sensor",
-                "tests.components.dyson.test_fan",
-                "tests.components.dyson.test_climate",
-                "tests.components.dyson.test_air_quality",
-                "tests.components.hue.test_light",
-                "tests.components.hue.test_init",
-                "tests.components.hue.test_bridge",
-                "tests.components.ios.test_init",
-                "tests.components.local_file.test_camera",
-                "tests.components.meteo_france.test_config_flow",
-                "tests.components.mikrotik.test_hub",
-                "tests.components.mikrotik.test_device_tracker",
-                "tests.components.mqtt.test_switch",
-                "tests.components.mqtt.test_state_vacuum",
-                "tests.components.mqtt.test_sensor",
-                "tests.components.mqtt.test_legacy_vacuum",
-                "tests.components.mqtt.test_light",
-                "tests.components.mqtt.test_init",
-                "tests.components.mqtt.test_fan",
-                "tests.components.mqtt.test_alarm_control_panel",
-                "tests.components.mqtt.test_binary_sensor",
-                "tests.components.mqtt.test_lock",
-                "tests.components.mqtt.test_light_json",
-                "tests.components.mqtt.test_cover",
-                "tests.components.mqtt.test_climate",
-                "tests.components.mqtt.test_camera",
-                "tests.components.qwikswitch.test_init",
-                "tests.components.rflink.test_init",
-                "tests.components.tplink.test_init",
-                "tests.components.tradfri.test_light",
-                "tests.components.unifi_direct.test_device_tracker",
-                "tests.components.upnp.test_init",
-                "tests.components.vera.test_init",
-                "tests.components.wunderground.test_sensor",
-                "tests.components.yr.test_sensor",
-                "tests.components.zha.test_api",
-                "tests.components.zha.test_binary_sensor",
-                "tests.components.zha.test_cover",
-                "tests.components.zha.test_device_action",
-                "tests.components.zha.test_device_tracker",
-                "tests.components.zha.test_device_trigger",
-                "tests.components.zha.test_discover",
-                "tests.components.zha.test_fan",
-                "tests.components.zha.test_gateway",
-                "tests.components.zha.test_light",
-                "tests.components.zha.test_lock",
-                "tests.components.zha.test_sensor",
-                "tests.components.zha.test_switch",
-                "tests.components.zwave.test_init",
-            ]:
+            if request.module.__name__ in IGNORE_UNCAUGHT_EXCEPTIONS:
                 continue
             if isinstance(ex, ServiceNotFound):
                 continue
@@ -160,6 +102,7 @@ def hass(loop, hass_storage, request):
     request.addfinalizer(fin)
 
     hass = loop.run_until_complete(async_test_home_assistant(loop))
+
     orig_exception_handler = loop.get_exception_handler()
     loop.set_exception_handler(exc_handle)
 
