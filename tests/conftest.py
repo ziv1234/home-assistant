@@ -15,6 +15,7 @@ from homeassistant.components.websocket_api.auth import (
     TYPE_AUTH_REQUIRED,
 )
 from homeassistant.components.websocket_api.http import URL
+from homeassistant.exceptions import ServiceNotFound
 from homeassistant.setup import async_setup_component
 from homeassistant.util import location
 
@@ -77,9 +78,90 @@ def hass_storage():
 
 
 @pytest.fixture
-def hass(loop, hass_storage):
+def hass(loop, hass_storage, request):
     """Fixture to provide a test instance of Home Assistant."""
+    exceptions = []
+
+    def exc_handle(loop, context):
+        """Handle exceptions by rethrowing them, which will fail the test."""
+        exceptions.append(context["exception"])
+        orig_exception_handler(loop, context)
+
+    def fin():
+        for ex in exceptions:
+            print(str(request.function.__name__))
+            print(str(request.module.__name__))
+            if request.module.__name__ in [
+                "tests.components.cast.test_media_player",
+                "tests.components.config.test_group",
+                "tests.components.deconz.test_init",
+                "tests.components.default_config.test_init",
+                "tests.components.demo.test_init",
+                "tests.components.directv.test_media_player",
+                "tests.components.discovery.test_init",
+                "tests.components.dsmr.test_sensor",
+                "tests.components.dyson.test_sensor",
+                "tests.components.dyson.test_fan",
+                "tests.components.dyson.test_climate",
+                "tests.components.dyson.test_air_quality",
+                "tests.components.hue.test_light",
+                "tests.components.hue.test_init",
+                "tests.components.hue.test_bridge",
+                "tests.components.ios.test_init",
+                "tests.components.local_file.test_camera",
+                "tests.components.meteo_france.test_config_flow",
+                "tests.components.mikrotik.test_hub",
+                "tests.components.mikrotik.test_device_tracker",
+                "tests.components.mqtt.test_switch",
+                "tests.components.mqtt.test_state_vacuum",
+                "tests.components.mqtt.test_sensor",
+                "tests.components.mqtt.test_legacy_vacuum",
+                "tests.components.mqtt.test_light",
+                "tests.components.mqtt.test_init",
+                "tests.components.mqtt.test_fan",
+                "tests.components.mqtt.test_alarm_control_panel",
+                "tests.components.mqtt.test_binary_sensor",
+                "tests.components.mqtt.test_lock",
+                "tests.components.mqtt.test_light_json",
+                "tests.components.mqtt.test_cover",
+                "tests.components.mqtt.test_climate",
+                "tests.components.mqtt.test_camera",
+                "tests.components.qwikswitch.test_init",
+                "tests.components.rflink.test_init",
+                "tests.components.tplink.test_init",
+                "tests.components.tradfri.test_light",
+                "tests.components.unifi_direct.test_device_tracker",
+                "tests.components.upnp.test_init",
+                "tests.components.vera.test_init",
+                "tests.components.wunderground.test_sensor",
+                "tests.components.yr.test_sensor",
+                "tests.components.zha.test_api",
+                "tests.components.zha.test_binary_sensor",
+                "tests.components.zha.test_cover",
+                "tests.components.zha.test_device_action",
+                "tests.components.zha.test_device_tracker",
+                "tests.components.zha.test_device_trigger",
+                "tests.components.zha.test_discover",
+                "tests.components.zha.test_fan",
+                "tests.components.zha.test_gateway",
+                "tests.components.zha.test_light",
+                "tests.components.zha.test_lock",
+                "tests.components.zha.test_sensor",
+                "tests.components.zha.test_switch",
+                "tests.components.zwave.test_init",
+            ]:
+                continue
+            if isinstance(ex, ServiceNotFound):
+                continue
+            raise ex
+            assert not ex  # failsafe
+
+    # This service gets triggered and raises an uncaught exception so creating a mock one
+    request.addfinalizer(fin)
+
     hass = loop.run_until_complete(async_test_home_assistant(loop))
+    orig_exception_handler = loop.get_exception_handler()
+    loop.set_exception_handler(exc_handle)
 
     yield hass
 

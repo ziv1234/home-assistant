@@ -54,12 +54,15 @@ async def test_add_devices_then_register(hass):
     # Now with devices
     device1 = Mock()
     device1.category = "light"
-    device1.name = "NAME"
+    device1.name = "NAME1"
+    device1.unique_id = "id1"
     device2 = Mock()
     device2.category = "switch"
+    device2.name = "NAME2"
+    device2.unique_id = "id2"
     new_device_func([device1, device2])
     await hass.async_block_till_done()
-    assert hass.states.get("light.name")
+    assert hass.states.get("light.name1")
 
 
 async def test_register_then_add_devices(hass):
@@ -77,9 +80,12 @@ async def test_register_then_add_devices(hass):
     # Now with devices
     device1 = Mock()
     device1.category = "light"
-    device1.name = "NAME"
+    device1.name = "NAME1"
+    device1.unique_id = "id1"
     device2 = Mock()
     device2.category = "switch"
+    device2.name = "NAME2"
+    device2.unique_id = "id2"
     new_device_func([device1, device2])
     await hass.async_block_till_done()
-    assert hass.states.get("light.name")
+    assert hass.states.get("light.name1")
