@@ -2,7 +2,7 @@
   "domain": "dynalite",
   "name": "Philips Dynalite",
   "config_flow": true,
-  "documentation": "https://www.home-assistant.io/integrations/dynalite",
+  "documentation": "https://www.home-assistant.io/inegrations/dynalite",
   "codeowners": ["@ziv1234"],
   "requirements": ["dynalite_devices==0.1.39"]
 }
