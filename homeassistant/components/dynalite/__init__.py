@@ -6,6 +6,7 @@ from typing import Any, Dict, Union
 import voluptuous as vol
 
 from homeassistant import config_entries
+from homeassistant.components import websocket_api
 from homeassistant.components.cover import DEVICE_CLASSES_SCHEMA
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT, CONF_TYPE
@@ -181,7 +182,6 @@ CONFIG_SCHEMA = vol.Schema(
 
 async def async_setup(hass: HomeAssistant, config: Dict[str, Any]) -> bool:
     """Set up the Dynalite platform."""
-
     conf = config.get(DOMAIN)
     LOGGER.debug("Setting up dynalite component config = %s", conf)
 
@@ -191,22 +191,20 @@ async def async_setup(hass: HomeAssistant, config: Dict[str, Any]) -> bool:
     hass.data[DOMAIN] = {}
 
     # User has configured bridges
-    if CONF_BRIDGES not in conf:
-        return True
-
-    bridges = conf[CONF_BRIDGES]
-
-    for bridge_conf in bridges:
-        host = bridge_conf[CONF_HOST]
-        LOGGER.debug("Starting config entry flow host=%s conf=%s", host, bridge_conf)
-
-        hass.async_create_task(
-            hass.config_entries.flow.async_init(
-                DOMAIN,
-                context={"source": config_entries.SOURCE_IMPORT},
-                data=bridge_conf,
+    if CONF_BRIDGES in conf:
+        bridges = conf[CONF_BRIDGES]
+        for bridge_conf in bridges:
+            host = bridge_conf[CONF_HOST]
+            LOGGER.debug(
+                "Starting config entry flow host=%s conf=%s", host, bridge_conf
             )
-        )
+            hass.async_create_task(
+                hass.config_entries.flow.async_init(
+                    DOMAIN,
+                    context={"source": config_entries.SOURCE_IMPORT},
+                    data=bridge_conf,
+                )
+            )
 
     async def dynalite_service(service_call: ServiceCall):
         data = service_call.data
@@ -249,6 +247,33 @@ async def async_setup(hass: HomeAssistant, config: Dict[str, Any]) -> bool:
                 vol.Required(ATTR_CHANNEL): int,
             }
         ),
+    )
+
+    def websocket_get_config_entry_data(hass, connection, msg):
+        """Handle getting a thumbnail."""
+        LOGGER.error("XXX msg=%s", msg)
+        LOGGER.error(
+            "XXX hass.data[DOMAIN]=%s",
+            hass.config_entries.async_get_entry(msg["entry_id"]).data,
+        )
+        connection.send_result(
+            msg["id"],
+            {"data": dict(hass.config_entries.async_get_entry(msg["entry_id"]).data)},
+        )
+
+    WS_TYPE_DYNALITE_AAA = "dynalite/aaa"
+    SCHEMA_WEBSOCKET_GET_THUMBNAIL = websocket_api.BASE_COMMAND_MESSAGE_SCHEMA.extend(
+        {
+            "type": WS_TYPE_DYNALITE_AAA,
+            # The entity that we want to retrieve the thumbnail for.
+            "entry_id": str,
+        }
+    )
+
+    hass.components.websocket_api.async_register_command(
+        WS_TYPE_DYNALITE_AAA,
+        websocket_get_config_entry_data,
+        SCHEMA_WEBSOCKET_GET_THUMBNAIL,
     )
 
     return True
