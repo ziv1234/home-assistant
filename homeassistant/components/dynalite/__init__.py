@@ -250,30 +250,34 @@ async def async_setup(hass: HomeAssistant, config: Dict[str, Any]) -> bool:
     )
 
     def websocket_get_config_entry_data(hass, connection, msg):
-        """Handle getting a thumbnail."""
-        LOGGER.error("XXX msg=%s", msg)
-        LOGGER.error(
-            "XXX hass.data[DOMAIN]=%s",
-            hass.config_entries.async_get_entry(msg["entry_id"]).data,
-        )
+        """Get the data of a config entry."""
         connection.send_result(
             msg["id"],
             {"data": dict(hass.config_entries.async_get_entry(msg["entry_id"]).data)},
         )
 
-    WS_TYPE_DYNALITE_AAA = "dynalite/aaa"
-    SCHEMA_WEBSOCKET_GET_THUMBNAIL = websocket_api.BASE_COMMAND_MESSAGE_SCHEMA.extend(
-        {
-            "type": WS_TYPE_DYNALITE_AAA,
-            # The entity that we want to retrieve the thumbnail for.
-            "entry_id": str,
-        }
+    WS_TYPE_DYNALITE_GET_ENTRY = "dynalite/get_entry"
+    SCHEMA_WEBSOCKET_GET_ENTRY = websocket_api.BASE_COMMAND_MESSAGE_SCHEMA.extend(
+        {"type": WS_TYPE_DYNALITE_GET_ENTRY, "entry_id": str}
+    )
+    hass.components.websocket_api.async_register_command(
+        WS_TYPE_DYNALITE_GET_ENTRY,
+        websocket_get_config_entry_data,
+        SCHEMA_WEBSOCKET_GET_ENTRY,
     )
 
+    def websocket_update_config_entry_data(hass, connection, msg):
+        """Update the data for a config entry."""
+        connection.send_result(msg["id"], {})
+
+    WS_TYPE_DYNALITE_UPDATE_ENTRY = "dynalite/update_entry"
+    SCHEMA_WEBSOCKET_UPDATE_ENTRY = websocket_api.BASE_COMMAND_MESSAGE_SCHEMA.extend(
+        {"type": WS_TYPE_DYNALITE_UPDATE_ENTRY, "entry_id": str, "entry_data": str}
+    )
     hass.components.websocket_api.async_register_command(
-        WS_TYPE_DYNALITE_AAA,
-        websocket_get_config_entry_data,
-        SCHEMA_WEBSOCKET_GET_THUMBNAIL,
+        WS_TYPE_DYNALITE_UPDATE_ENTRY,
+        websocket_update_config_entry_data,
+        SCHEMA_WEBSOCKET_UPDATE_ENTRY,
     )
 
     return True
