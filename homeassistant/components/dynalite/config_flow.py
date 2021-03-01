@@ -71,7 +71,9 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     ): vol.Schema(
                         {
                             vol.Required("ip"): str,
-                            vol.Optional("port"): int,
+                            vol.Optional(
+                                "port", description={"suggested_value": 99}
+                            ): int,
                             vol.Optional("advanced"): vol.Schema(
                                 {
                                     vol.Optional("timeout"): int,
@@ -91,4 +93,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     ): str,
                 }
             ),
+            errors={"server": {"base": "abc"}},
+            # errors={"server": {"advanced": {"base": "abc"}}},
         )

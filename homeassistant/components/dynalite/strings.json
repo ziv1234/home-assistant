@@ -37,6 +37,9 @@
           "log": "Log file name"
         }
       }
+    },
+    "error": {
+      "abc": "def"
     }
   }
 }
