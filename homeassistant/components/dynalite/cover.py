@@ -4,6 +4,7 @@ from typing import Any
 
 from homeassistant.components.cover import DEVICE_CLASSES, CoverDeviceClass, CoverEntity
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -26,7 +27,7 @@ async def async_setup_entry(
         return DynaliteCover(device, bridge)
 
     async_setup_entry_base(
-        hass, config_entry, async_add_entities, "cover", cover_from_device
+        hass, config_entry, async_add_entities, Platform.COVER, cover_from_device
     )
 
 

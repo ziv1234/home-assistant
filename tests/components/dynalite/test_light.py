@@ -3,6 +3,7 @@ from dynalite_devices_lib.light import DynaliteChannelLightDevice
 import pytest
 
 from homeassistant.components.light import (
+    ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
     ATTR_SUPPORTED_COLOR_MODES,
     ColorMode,
@@ -10,7 +11,10 @@ from homeassistant.components.light import (
 from homeassistant.const import (
     ATTR_FRIENDLY_NAME,
     ATTR_SUPPORTED_FEATURES,
+    SERVICE_TURN_OFF,
+    SERVICE_TURN_ON,
     STATE_UNAVAILABLE,
+    Platform,
 )
 
 from .common import (
@@ -26,7 +30,7 @@ from .common import (
 @pytest.fixture
 def mock_device():
     """Mock a Dynalite device."""
-    return create_mock_device("light", DynaliteChannelLightDevice)
+    return create_mock_device(Platform.LIGHT, DynaliteChannelLightDevice)
 
 
 async def test_light_setup(hass, mock_device):
@@ -34,17 +38,17 @@ async def test_light_setup(hass, mock_device):
     await create_entity_from_device(hass, mock_device)
     entity_state = hass.states.get("light.name")
     assert entity_state.attributes[ATTR_FRIENDLY_NAME] == mock_device.name
-    assert entity_state.attributes["brightness"] == mock_device.brightness
+    assert entity_state.attributes[ATTR_BRIGHTNESS] == mock_device.brightness
     assert entity_state.attributes[ATTR_COLOR_MODE] == ColorMode.BRIGHTNESS
     assert entity_state.attributes[ATTR_SUPPORTED_COLOR_MODES] == [ColorMode.BRIGHTNESS]
     assert entity_state.attributes[ATTR_SUPPORTED_FEATURES] == 0
     await run_service_tests(
         hass,
         mock_device,
-        "light",
+        Platform.LIGHT,
         [
-            {ATTR_SERVICE: "turn_on", ATTR_METHOD: "async_turn_on"},
-            {ATTR_SERVICE: "turn_off", ATTR_METHOD: "async_turn_off"},
+            {ATTR_SERVICE: SERVICE_TURN_ON, ATTR_METHOD: "async_turn_on"},
+            {ATTR_SERVICE: SERVICE_TURN_OFF, ATTR_METHOD: "async_turn_off"},
         ],
     )
 

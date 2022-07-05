@@ -2,6 +2,7 @@
 
 from homeassistant.components.light import ColorMode, LightEntity
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -15,7 +16,7 @@ async def async_setup_entry(
 ) -> None:
     """Record the async_add_entities function to add them later when received from Dynalite."""
     async_setup_entry_base(
-        hass, config_entry, async_add_entities, "light", DynaliteLight
+        hass, config_entry, async_add_entities, Platform.LIGHT, DynaliteLight
     )
 
 

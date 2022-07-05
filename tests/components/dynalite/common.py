@@ -2,7 +2,7 @@
 from unittest.mock import AsyncMock, Mock, call, patch
 
 from homeassistant.components import dynalite
-from homeassistant.const import ATTR_SERVICE
+from homeassistant.const import ATTR_ENTITY_ID, ATTR_SERVICE
 from homeassistant.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
@@ -52,7 +52,7 @@ async def run_service_tests(hass, device, platform, services):
     for cur_item in services:
         service = cur_item[ATTR_SERVICE]
         args = cur_item.get(ATTR_ARGS, {})
-        service_data = {"entity_id": f"{platform}.name", **args}
+        service_data = {ATTR_ENTITY_ID: f"{platform}.name", **args}
         await hass.services.async_call(platform, service, service_data, blocking=True)
         await hass.async_block_till_done()
         for check_item in services:

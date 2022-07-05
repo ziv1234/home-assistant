@@ -6,6 +6,7 @@ import pytest
 
 from homeassistant import config_entries
 from homeassistant.components import dynalite
+from homeassistant.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -13,9 +14,21 @@ from tests.common import MockConfigEntry
 @pytest.mark.parametrize(
     "first_con, second_con,exp_type, exp_result, exp_reason",
     [
-        (True, True, "create_entry", config_entries.ConfigEntryState.LOADED, ""),
-        (False, False, "abort", None, "no_connection"),
-        (True, False, "create_entry", config_entries.ConfigEntryState.SETUP_RETRY, ""),
+        (
+            True,
+            True,
+            FlowResultType.CREATE_ENTRY,
+            config_entries.ConfigEntryState.LOADED,
+            "",
+        ),
+        (False, False, FlowResultType.ABORT, None, "no_connection"),
+        (
+            True,
+            False,
+            FlowResultType.CREATE_ENTRY,
+            config_entries.ConfigEntryState.SETUP_RETRY,
+            "",
+        ),
     ],
 )
 async def test_flow(hass, first_con, second_con, exp_type, exp_result, exp_reason):
@@ -53,7 +66,7 @@ async def test_existing(hass):
             context={"source": config_entries.SOURCE_IMPORT},
             data={dynalite.CONF_HOST: host},
         )
-    assert result["type"] == "abort"
+    assert result["type"] == FlowResultType.ABORT
     assert result["reason"] == "already_configured"
 
 
@@ -83,7 +96,7 @@ async def test_existing_update(hass):
         await hass.async_block_till_done()
         assert mock_dyn_dev().configure.call_count == 2
         assert mock_dyn_dev().configure.mock_calls[1][1][0]["port"] == port2
-    assert result["type"] == "abort"
+    assert result["type"] == FlowResultType.ABORT
     assert result["reason"] == "already_configured"
 
 
@@ -103,5 +116,5 @@ async def test_two_entries(hass):
             context={"source": config_entries.SOURCE_IMPORT},
             data={dynalite.CONF_HOST: host2},
         )
-    assert result["type"] == "create_entry"
+    assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["result"].state == config_entries.ConfigEntryState.LOADED

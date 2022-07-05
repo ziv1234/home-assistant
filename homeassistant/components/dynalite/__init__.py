@@ -8,7 +8,14 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.components.cover import DEVICE_CLASSES_SCHEMA
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_DEFAULT, CONF_HOST, CONF_NAME, CONF_PORT, CONF_TYPE
+from homeassistant.const import (
+    CONF_DEFAULT,
+    CONF_HOST,
+    CONF_NAME,
+    CONF_PORT,
+    CONF_TYPE,
+    Platform,
+)
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import config_validation as cv
@@ -69,7 +76,7 @@ CHANNEL_DATA_SCHEMA = vol.Schema(
         vol.Optional(CONF_NAME): cv.string,
         vol.Optional(CONF_FADE): vol.Coerce(float),
         vol.Optional(CONF_TYPE, default=DEFAULT_CHANNEL_TYPE): vol.Any(
-            "light", "switch"
+            Platform.LIGHT.value, Platform.SWITCH.value
         ),
     }
 )

@@ -3,7 +3,12 @@
 from dynalite_devices_lib.switch import DynalitePresetSwitchDevice
 import pytest
 
-from homeassistant.const import ATTR_FRIENDLY_NAME
+from homeassistant.const import (
+    ATTR_FRIENDLY_NAME,
+    SERVICE_TURN_OFF,
+    SERVICE_TURN_ON,
+    Platform,
+)
 
 from .common import (
     ATTR_METHOD,
@@ -17,7 +22,7 @@ from .common import (
 @pytest.fixture
 def mock_device():
     """Mock a Dynalite device."""
-    return create_mock_device("switch", DynalitePresetSwitchDevice)
+    return create_mock_device(Platform.SWITCH, DynalitePresetSwitchDevice)
 
 
 async def test_switch_setup(hass, mock_device):
@@ -30,7 +35,7 @@ async def test_switch_setup(hass, mock_device):
         mock_device,
         "switch",
         [
-            {ATTR_SERVICE: "turn_on", ATTR_METHOD: "async_turn_on"},
-            {ATTR_SERVICE: "turn_off", ATTR_METHOD: "async_turn_off"},
+            {ATTR_SERVICE: SERVICE_TURN_ON, ATTR_METHOD: "async_turn_on"},
+            {ATTR_SERVICE: SERVICE_TURN_OFF, ATTR_METHOD: "async_turn_off"},
         ],
     )
